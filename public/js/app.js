@@ -355,6 +355,7 @@ const App = {
     if (params.tag) document.getElementById('filter-tag').value = params.tag;
     if (params.user) document.getElementById('filter-user').value = params.user;
     if (params.printed) document.getElementById('filter-printed').value = params.printed;
+    if (params.file_type) document.getElementById('filter-type').value = params.file_type;
     if (params.sort) document.getElementById('filter-sort').value = params.sort;
     if (params.limit) {
       const limitSelect = document.getElementById('filter-limit');
@@ -856,24 +857,26 @@ const App = {
     this.searchTimeout = setTimeout(() => this.handleFilter(), 300);
   },
 
-  handleFilter() {
+  collectFilterParams(page = 1) {
+    const val = (id) => document.getElementById(id)?.value;
     const params = new URLSearchParams();
-    const search = document.getElementById('search-input')?.value;
-    const category = document.getElementById('filter-category')?.value;
-    const tag = document.getElementById('filter-tag')?.value;
-    const user = document.getElementById('filter-user')?.value;
-    const printed = document.getElementById('filter-printed')?.value;
-    const sort = document.getElementById('filter-sort')?.value;
-    const limit = document.getElementById('filter-limit')?.value;
+    const sort = val('filter-sort');
+    const limit = val('filter-limit');
 
-    if (search) params.set('search', search);
-    if (category) params.set('category', category);
-    if (tag) params.set('tag', tag);
-    if (user) params.set('user', user);
-    if (printed) params.set('printed', printed);
+    if (val('search-input')) params.set('search', val('search-input'));
+    if (val('filter-category')) params.set('category', val('filter-category'));
+    if (val('filter-tag')) params.set('tag', val('filter-tag'));
+    if (val('filter-user')) params.set('user', val('filter-user'));
+    if (val('filter-printed')) params.set('printed', val('filter-printed'));
+    if (val('filter-type')) params.set('file_type', val('filter-type'));
     if (sort && sort !== 'updated') params.set('sort', sort);
     if (limit && limit !== '24') params.set('limit', limit);
-    params.set('page', '1');
+    params.set('page', String(page));
+    return params;
+  },
+
+  handleFilter() {
+    const params = this.collectFilterParams(1);
 
     if (this.libraryViewMode === 'folder') {
       this.renderBrowse(this.currentBrowsePath);
@@ -883,23 +886,7 @@ const App = {
   },
 
   goToPage(pageNumber) {
-    const params = new URLSearchParams();
-    const search = document.getElementById('search-input')?.value;
-    const category = document.getElementById('filter-category')?.value;
-    const tag = document.getElementById('filter-tag')?.value;
-    const user = document.getElementById('filter-user')?.value;
-    const printed = document.getElementById('filter-printed')?.value;
-    const sort = document.getElementById('filter-sort')?.value;
-    const limit = document.getElementById('filter-limit')?.value;
-
-    if (search) params.set('search', search);
-    if (category) params.set('category', category);
-    if (tag) params.set('tag', tag);
-    if (user) params.set('user', user);
-    if (printed) params.set('printed', printed);
-    if (sort && sort !== 'updated') params.set('sort', sort);
-    if (limit && limit !== '24') params.set('limit', limit);
-    params.set('page', pageNumber);
+    const params = this.collectFilterParams(pageNumber);
 
     window.location.hash = `/models?${params.toString()}`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
