@@ -344,7 +344,7 @@ if (fs.existsSync(LIBRARY_PATH)) {
 
 app.get('/api/models', (req, res) => {
   try {
-    const { search, category, tag, user, printed, sort = 'updated', order, project_id, page = 1, limit = 24 } = req.query;
+    const { search, category, tag, user, printed, file_type, sort = 'updated', order, project_id, page = 1, limit = 24 } = req.query;
     let query = `SELECT m.*, c.name as category_name, c.color as category_color, u.username as uploader_name,
       (SELECT COUNT(*) FROM files WHERE model_id=m.id) as file_count,
       (SELECT COUNT(*) FROM print_history WHERE model_id=m.id) as print_count,
@@ -367,6 +367,7 @@ app.get('/api/models', (req, res) => {
     if (search) { conds.push("(m.name LIKE ? OR m.description LIKE ?)"); params.push(`%${search}%`, `%${search}%`); }
     if (category) { conds.push("m.category_id=?"); params.push(Number(category)); }
     if (tag) { conds.push("m.id IN (SELECT model_id FROM model_tags WHERE tag_id=?)"); params.push(Number(tag)); }
+    if (file_type) { conds.push("m.id IN (SELECT model_id FROM files WHERE file_type=?)"); params.push(String(file_type)); }
     if (user) { conds.push("m.user_id=?"); params.push(Number(user)); }
     if (printed === 'true') conds.push("m.id IN (SELECT DISTINCT model_id FROM print_history)");
     else if (printed === 'false') conds.push("m.id NOT IN (SELECT DISTINCT model_id FROM print_history)");

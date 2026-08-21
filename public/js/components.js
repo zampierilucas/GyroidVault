@@ -940,6 +940,15 @@ const UI = {
           <option value="true">Printed</option>
           <option value="false">Not Printed</option>
         </select>
+        <select class="filter-select" id="filter-type" onchange="App.handleFilter()">
+          <option value="">All File Types</option>
+          <option value="stl">STL</option>
+          <option value="3mf">3MF</option>
+          <option value="gcode">G-code</option>
+          <option value="step">STEP</option>
+          <option value="obj">OBJ</option>
+          <option value="f3d">F3D</option>
+        </select>
         <select class="filter-select" id="filter-sort" onchange="App.handleFilter()">
           <option value="updated">Last Updated</option>
           <option value="created">Date Created</option>
