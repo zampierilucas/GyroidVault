@@ -1,0 +1,25 @@
+services:
+  gyroidvault:
+    image: ghcr.io/teecodedev/gyroidvault:latest
+    container_name: gyroidvault
+    ports:
+      - "3457:3000"
+    volumes:
+      - ./data:/app/data
+      - type: bind
+        source: /mnt/storage/3dprints
+        target: /library
+        bind:
+          create_host_path: false
+      - ./patch/index.js:/app/server/index.js:ro
+      - ./patch/library.js:/app/server/utils/library.js:ro
+      - ./patch/f3d.js:/app/server/utils/f3d.js:ro
+      - ./patch/app.js:/app/public/js/app.js:ro
+      - ./patch/components.js:/app/public/js/components.js:ro
+      - ./patch/viewer.js:/app/public/js/viewer.js:ro
+      - ./patch/stl-worker.js:/app/public/js/stl-worker.js:ro
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - LIBRARY_PATH=/library
+    restart: unless-stopped
