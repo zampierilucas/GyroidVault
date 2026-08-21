@@ -34,6 +34,13 @@ function logEvent(level, message) {
 // Quick hack to make sure files in DB didn't get manualy deleted from disk
 async function syncLibraryWithDisk() {
   try {
+    try {
+      if ((await fs.promises.readdir(LIBRARY_PATH)).length === 0) throw new Error('library is empty');
+    } catch (err) {
+      console.warn(`[Sync] Skipping sync, library at ${LIBRARY_PATH} is unreadable or empty (${err.message}). Refusing to delete every entry.`);
+      return;
+    }
+
     const files = all('SELECT id, library_path, original_name FROM files WHERE library_path IS NOT NULL');
     let deletedCount = 0;
     for (const file of files) {
